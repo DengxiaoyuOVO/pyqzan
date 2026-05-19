@@ -41,7 +41,7 @@
             <view class="num">{{ item.title }}</view>
             <image
               class="list_img"
-              :src="`https://cdn.jzzz66.cn/type${index + 1}.jpeg`"
+              :src="`/static/img/type${index + 1}.jpeg`"
               mode="widthFix"
             ></image>
             <radio

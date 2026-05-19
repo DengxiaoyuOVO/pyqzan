@@ -27,7 +27,7 @@
                 <text>发表图片或者文字的图文样式。</text>
                 <image
                   class="list_img"
-                  src="https://cdn.jzzz66.cn/rule1.png"
+                  src="/static/img/rule1.png"
                   mode="widthFix"
                 />
               </view>
@@ -40,7 +40,7 @@
                 >
                 <image
                   class="list_img"
-                  src="https://cdn.jzzz66.cn/rule2.png"
+                  src="/static/img/rule2.png"
                   mode="widthFix"
                 />
               </view>
@@ -51,7 +51,7 @@
                 ><text>主图样式，生成点赞和评论数量。</text>
                 <image
                   class="list_img"
-                  src="https://cdn.jzzz66.cn/rule3.png"
+                  src="/static/img/rule3.png"
                   mode="widthFix"
                 />
               </view>
@@ -79,7 +79,7 @@
                 <text>朋友圈内容截图，需裁切成下面这样。</text>
                 <image
                   class="list_img"
-                  src="https://cdn.jzzz66.cn/auto1.png"
+                  src="/static/img/auto1.png"
                   mode="widthFix"
                 />
               </view>
@@ -90,7 +90,7 @@
                 ><text>朋友评论截图，需裁切成下面这样。</text>
                 <image
                   class="list_img"
-                  src="https://cdn.jzzz66.cn/auto2.png"
+                  src="/static/img/auto2.png"
                   mode="widthFix"
                 />
               </view>
@@ -103,7 +103,7 @@
             >
             <image
               class="list_img auto3img"
-              src="https://cdn.jzzz66.cn/auto3.png"
+              src="/static/img/auto3.png"
               mode="widthFix"
             />
           </view>
@@ -119,13 +119,13 @@
             >
             <image
               class="list_img artimg"
-              src="https://cdn.jzzz66.cn/art1.png"
+              src="/static/img/art1.png"
               mode="widthFix"
             />
             <view class="list_box">然后再长按图片保存到手机即可。</view>
             <image
               class="list_img artimg"
-              src="https://cdn.jzzz66.cn/art2.png"
+              src="/static/img/art2.png"
               mode="widthFix"
             />
           </view>
@@ -136,7 +136,7 @@
             >
             <image
               class="list_img artimg"
-              src="https://cdn.jzzz66.cn/art4.png"
+              src="/static/img/art4.png"
               mode="widthFix"
             />
           </view>

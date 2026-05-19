@@ -78,7 +78,7 @@ export default {
         },
         linkInfo: {
           linkText: "点击输入公众号文章描述",
-          linkImg: "https://weiapi.jzzz66.cn/avatar.png",
+          linkImg: "/static/img/avatar.png",
         },
         comment: {
           commentNum: 0,

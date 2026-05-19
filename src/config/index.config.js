@@ -1,14 +1,14 @@
 const CONFIG = {
-  //开发环境配置
+  //开发环境配�?
   development: {
-    assetsPath: "/static/images/", // 静态资源路径
-    baseUrl: "http://localhost:3000",
+    assetsPath: "/static/images/", // 静态资源路�?
+    baseUrl: "http://localhost:3456",
   },
 
   //生产环境配置
   production: {
-    assetsPath: "/static/images/", // 静态资源路径
-    baseUrl: "https://wei.jzzz66.cn",
+    assetsPath: "/static/images/", // 静态资源路�?
+    baseUrl: "",
   },
 };
 
