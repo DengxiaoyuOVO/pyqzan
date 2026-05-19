@@ -1,15 +1,9 @@
-<template>
+﻿<template>
   <view class="pagearticle" ref="render">
     <renderimg-popup
       :imgUrl="renderUrl"
       :isShow="isShowRender"
       @close="isShowRender = false"
-    />
-    <rule-popup
-      v-if="isRulePopup"
-      :isShow="isRulePopup"
-      type="article"
-      @close="isRulePopup = false"
     />
     <view class="content">
       <html2canvas
@@ -20,7 +14,7 @@
         <view id="poster">
           <!-- 手机顶部导航 -->
           <block v-if="pageData.navbar">
-            <navbar @handle="handleRight" :pageData="pageData" />
+            <navbar @handle="doNothing" :pageData="pageData" />
           </block>
           <!-- 文章内容模块 -->
           <article-module
@@ -65,7 +59,12 @@
         </view>
       </html2canvas>
     </view>
-  </view>
+      <!-- 保存截图按钮 -->
+    <view class="save-btn" @click="doSave" v-if="!isShowRender">
+      <text class="iconfont icon-good"></text>
+      <text>保存截图</text>
+    </view>
+</view>
 </template>
 
 <script>
@@ -74,67 +73,49 @@ export default {
   data() {
     return {
       isShowRender: false,
-      isRulePopup: false,
-      isFixed: true,
+      renderUrl: "",
+      isRulePopup: true,
+      coordinate: {},
+      longSelectHidden: false,
+      isFixed: false,
+      isFocus: false,
+      selfGood: false,
       reply: {
         isReply: false,
         username: "",
       },
-      coordinate: {},
-      //选择Item的开启状态
-      longSelectHidden: false,
-
-      //页面数据
+      domId: "",
       pageData: {
         type: 0,
         navbar: false,
+        navbarTime: "",
         dian: 0,
+        linkInfo: {
+          linkText: "",
+          linkImg: "/static/img/avatar.png",
+        },
         article: {
           username: "",
           avatar: "",
-          contentText: "哈哈哈",
+          contentText: "",
           pictureList: [],
           date: {
             date: "",
             time: "",
           },
         },
-        linkInfo: {
-          linkText: "点击输入公众号文章描述",
-          linkImg: "/static/img/avatar.png",
-        },
         comment: {
-          goodUserAvatarList: 0, //临时为数字
-          commentUserList: [
-            {
-              username: "",
-              avatar: "",
-              contentText: "",
-              date: {
-                date: "2020年2月8日",
-                time: "15:40",
-              },
-            },
-          ],
+          commentNum: 0,
+          goodUserAvatarList: 0,
+          commentUserList: [],
         },
       },
-      //是否聚焦input
-      isFocus: false,
-      // 是否自赞
-      selfGood: false,
-      domId: "",
-      renderUrl: "",
     };
   },
-  mounted() {
+  onLoad(option) {
     this.domId = "#poster";
-  },
-  onLoad(options) {
-    this.isRulePopup = true;
-    if (options.data) {
-      this.pageData = JSON.parse(options.data);
-      console.log(this.pageData);
-    }
+    const data = JSON.parse(option.data);
+    this.pageData = data;
   },
   methods: {
     handleRight(data) {
@@ -169,13 +150,9 @@ export default {
       this.reply.isReply = false;
       this.reply.username = "";
     },
-    //点击了赞按钮
     clickGood(data) {
       this.selfGood = data;
     },
-    /**
-     * 展开长按选择数据传递（传入组件long-select-item坐标信息）
-     */
     showSelect(data) {
       this.coordinate = data;
       this.longSelectHidden = true;
@@ -197,9 +174,26 @@ export default {
       this.reply.username = "";
       this.isFocus = false;
     },
+    doNothing() {},
+    async doSave() {
+      this.isFixed = false;
+      uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
+      try {
+        const el = document.querySelector("#poster");
+        if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        this.renderUrl = canvas.toDataURL("image/png", 1);
+        uni.hideToast();
+        this.isShowRender = true;
+      } catch(e) {
+        uni.hideToast();
+        uni.showToast({ title: "生成失败: " + e.message, icon: "none", duration: 3000 });
+      }
+    },
   },
 };
 </script>
+
 
 <style lang="scss">
 /* 针对手机设备 */
@@ -227,4 +221,19 @@ export default {
     padding-bottom: 2upx;
   }
 }
+.save-btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 90upx;
+    background-color: #1677ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32upx;
+    z-index: 999;
+    gap: 10upx;
+  }
 </style>

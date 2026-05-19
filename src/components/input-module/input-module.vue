@@ -152,7 +152,7 @@
 
 		.input-view {
 			flex: 7;
-			caret-color: #07c160;
+			caret-color: #1677ff;
 			background-color: white;
 			padding: 20upx;
 			border-radius: 10upx;

@@ -8,7 +8,7 @@
         v-model="articleUrl"
         placeholder="请输入公众号文章链接"
       />
-      <view class="popup_btn" @tap="getArticle"> 获取 </view>
+      <view class="popup_btn" @click="getArticle"> 获取 </view>
     </view>
   </popup>
 </template>
@@ -39,22 +39,24 @@ export default {
   methods: {
     async getArticle() {
       if (this.articleUrl.length == 0) {
+        uni.showToast({ title: "请输入链接", icon: "none" });
         return;
       }
-      uni.showLoading({
-        title: "正在获取中...",
-      });
-      const res = await this.$api.getArticle({
-        url: this.articleUrl,
-      });
-      const linkData = {
-        linkText: res.title,
-        linkImg: res.imgUrl,
-      };
-      uni.hideLoading();
-      this.articleUrl = "";
-      this.$refs.articlepopup.hide();
-      this.$emit("submit", linkData);
+      uni.showLoading({ title: "正在获取中...", mask: true });
+      try {
+        const res = await this.$api.getArticle({ url: this.articleUrl });
+        const linkData = {
+          linkText: res.title || "未获取到标题",
+          linkImg: res.imgUrl || "/static/img/avatar.png",
+        };
+        uni.hideLoading();
+        this.articleUrl = "";
+        this.$refs.articlepopup.hide();
+        this.$emit("submit", linkData);
+      } catch(e) {
+        uni.hideLoading();
+        uni.showToast({ title: "获取失败，请检查链接或网络", icon: "none", duration: 3000 });
+      }
     },
     close() {
       this.$emit("close");

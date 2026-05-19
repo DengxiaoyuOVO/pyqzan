@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<view class="pagearticle" ref="render">
 		<renderimg-popup :imgUrl="renderUrl" :isShow="isShowRender" @close="isShowRender = false" />
 		<view class="hotBox" @tap="handleRight"></view>
@@ -16,68 +16,80 @@
 				</view>
 			</html2canvas>
 		</view>
-	</view>
+	    <!-- 保存截图按钮 -->
+    <view class="save-btn" @click="doSave" v-if="!isShowRender">
+      <text class="iconfont icon-good"></text>
+      <text>保存截图</text>
+    </view>
+</view>
 </template>
 
 <script>
-	import html2canvas from 'html2canvas';
-	export default {
-		data() {
-			return {
-				isShowRender: false,
-				isFixed: true,
-				coordinate: {},
-				longSelectHidden: false,
-				pageData: {
-					type: 0,
-					articleImgList: [],
-					comment: {
-						commentNum: 0,
-						goodUserAvatarList: 0,
-						commentUserList: []
-					}
-				},
-				domId: '',
-				renderUrl: ''
-			}
-		},
-		mounted() {
-			this.domId = '#poster'
-		},
-		onLoad(options) {
-			if (options.data) {
-				this.pageData = JSON.parse(options.data)
-			}
-		},
-		methods: {
-			preImg() {
-				this.isFixed = false
-				setTimeout(()=>{
-          this.$refs.html2canvas.createImg();
-        },200)
-			},
-			handleRight(){
-				this.coordinate = {
-					x: 220,
-					y: 50
-				}
-				this.longSelectHidden = true
-			},
-			renderFinish(filePath) {
-				this.renderUrl = filePath
-				uni.hideToast();
-				this.isShowRender = true
-			},
-			showSelect(data) {
-				this.coordinate = data
-				this.longSelectHidden = true
-			},
-			hideLong() {
-				this.longSelectHidden = false
-			},
-		}
-	}
+import html2canvas from "html2canvas";
+export default {
+  data() {
+    return {
+      isShowRender: false,
+      renderUrl: "",
+      coordinate: {},
+      longSelectHidden: false,
+      isFixed: false,
+      domId: "",
+      pageData: {
+        type: 0,
+        articleImgList: [],
+        comment: {
+          commentNum: 0,
+          goodUserAvatarList: 0,
+          commentUserList: [],
+        },
+      },
+    };
+  },
+  onLoad(option) {
+    this.domId = "#poster";
+    const data = JSON.parse(option.data);
+    this.pageData = data;
+  },
+  methods: {
+    handleRight(data) {
+      this.coordinate = data;
+      this.longSelectHidden = !this.longSelectHidden;
+    },
+    hideLong() {
+      this.longSelectHidden = false;
+    },
+    preImg() {
+      this.isFixed = false;
+      setTimeout(()=>{
+        this.$refs.html2canvas.createImg();
+      },200)
+    },
+    renderFinish(filePath) {
+      this.renderUrl = filePath;
+      uni.hideToast();
+      this.isShowRender = true;
+      this.isFixed = true;
+    },
+    async doSave() {
+      this.isFixed = false;
+      uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
+      try {
+        const el = document.querySelector("#poster");
+        if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        this.renderUrl = canvas.toDataURL("image/png", 1);
+        uni.hideToast();
+        this.isShowRender = true;
+      } catch(e) {
+        uni.hideToast();
+        uni.showToast({ title: "生成失败: " + e.message, icon: "none", duration: 3000 });
+      }
+    },
+  },
+};
 </script>
+
 
 <style lang="scss">
 /* 针对手机设备 */
@@ -131,4 +143,19 @@
 			padding-bottom: 2upx;
 		}
 	}
+.save-btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 90upx;
+    background-color: #1677ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32upx;
+    z-index: 999;
+    gap: 10upx;
+  }
 </style>

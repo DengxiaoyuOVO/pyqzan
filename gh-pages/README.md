@@ -4,7 +4,7 @@
 
 ## 在线使用
 
-### GitHub Pages（截图功能）
+### 当前站点（截图功能）
 https://dengxiaoyuovo.github.io/pyqzan/
 
 ### 全功能版（截图 + 获取公众号信息）
@@ -21,10 +21,3 @@ https://dengxiaoyuovo.github.io/pyqzan/
 6. 点 "Create Web Service"，等几分钟上线
 
 部署后截图功能和获取公众号信息全部可用，零维护。
-
-## 本地运行
-
-```bash
-npm install
-npm run serve
-```

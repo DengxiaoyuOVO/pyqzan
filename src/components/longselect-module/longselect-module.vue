@@ -67,7 +67,7 @@ export default {
     //展开选择item
     _showSelect(e) {
       //短震动
-      uni.vibrateShort({});
+      try { uni.vibrateShort({}); } catch(e) {}
       this.showLeft = e.x + "px";
       this.showTop = e.y + "px";
       let animation = uni.createAnimation({

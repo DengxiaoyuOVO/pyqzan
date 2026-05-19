@@ -9,8 +9,8 @@
       <slider
         class="right-slide"
         :value="slideValue"
-        block-color="#07c160"
-        activeColor="#07c160"
+        block-color="#1677ff"
+        activeColor="#1677ff"
         :max="max"
         @change="sliderChange"
       />
@@ -27,7 +27,7 @@
       v-if="type == 'switch'"
     >
       {{ title }}
-      <switch @change="switchChange" color="#07c160" />
+      <switch @change="switchChange" color="#1677ff" />
     </view>
     <view
       class="set-item-text"

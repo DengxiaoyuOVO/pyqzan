@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <view class="main">
     <renderimg-popup
       :imgUrl="renderUrl"
@@ -49,84 +49,82 @@
         </view>
       </view>
     </html2canvas>
-  </view>
+      <!-- 保存截图按钮 -->
+    <view class="save-btn" @click="doSave" v-if="!isShowRender">
+      <text class="iconfont icon-good"></text>
+      <text>保存截图</text>
+    </view>
+</view>
 </template>
 
 <script>
+import html2canvas from "html2canvas";
 export default {
   data() {
     return {
       isShowRender: false,
+      renderUrl: "",
       coordinate: {},
       longSelectHidden: false,
       domId: "",
-      renderUrl: "",
-      //页面数据
       pageData: {
-        type: 0,
+        type: 2,
         navbar: false,
+        navbarTime: "",
         dian: 0,
         article: {
           username: "",
           avatar: "",
-          contentText: "哈哈哈",
+          contentText: "",
           pictureList: [],
-          date: {
-            date: "",
-            time: "",
-          },
-        },
-        linkInfo: {
-          linkText: "点击输入公众号文章描述",
-          linkImg: "/static/img/avatar.png",
+          date: { date: "", time: "" },
         },
         comment: {
           commentNum: 0,
-          goodUserAvatarList: 0, //临时为数字
-          commentUserList: [
-            {
-              username: "",
-              avatar: "",
-              contentText: "",
-              date: {
-                date: "2020年2月8日",
-                time: "15:40",
-              },
-            },
-          ],
+          goodUserAvatarList: 0,
+          commentUserList: [],
         },
       },
     };
   },
-  onLoad(options) {
-    if (options.data) {
-      this.pageData = JSON.parse(options.data);
-    }
-  },
-  mounted() {
-    this.domId = "#main";
+  onLoad(option) {
+    this.domId = "#poster";
+    const data = JSON.parse(option.data);
+    this.pageData = data;
   },
   methods: {
-    hideLong() {
-      this.longSelectHidden = false;
-    },
     handleRight(data) {
       this.coordinate = data;
-      this.longSelectHidden = true;
+      this.longSelectHidden = !this.longSelectHidden;
+    },
+    preImg() {
+      setTimeout(()=>{
+        this.$refs.html2canvas.createImg();
+      },200)
     },
     renderFinish(filePath) {
       this.renderUrl = filePath;
       uni.hideToast();
       this.isShowRender = true;
     },
-    preImg() {
-      setTimeout(()=>{
-        this.$refs.html2canvas.createImg();
-      }, 200)
+    async doSave() {
+      uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
+      try {
+        const el = document.querySelector("#poster");
+        if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        this.renderUrl = canvas.toDataURL("image/png", 1);
+        uni.hideToast();
+        this.isShowRender = true;
+      } catch(e) {
+        uni.hideToast();
+        uni.showToast({ title: "生成失败: " + e.message, icon: "none", duration: 3000 });
+      }
     },
   },
 };
 </script>
+
 
 <style lang="scss">
 /* 针对手机设备 */
@@ -227,4 +225,19 @@ export default {
     }
   }
 }
+.save-btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 90upx;
+    background-color: #1677ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32upx;
+    z-index: 999;
+    gap: 10upx;
+  }
 </style>

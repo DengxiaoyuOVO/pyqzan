@@ -46,7 +46,7 @@
             ></image>
             <radio
               :value="item.value"
-              color="#07c160"
+              color="#1677ff"
               :checked="index === current"
             />
           </label>
