@@ -4,13 +4,20 @@
 
 ## 在线使用
 
-### 当前站点
+### 当前站点（截图功能）
 https://dengxiaoyuovo.github.io/pyqzan/
 
-> 截图功能完整可用；获取公众号信息需要部署下方 Vercel 版本
+### 全功能版（截图 + 获取公众号信息）
 
-### 全功能版（含获取公众号信息）
+部署到 Render（免费，无需手机验证）：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/DengxiaoyuOVO/pyqzan)
+1. 打开 https://render.com
+2. 点右上角 "Get Started" → 用 GitHub 账号登录
+3. 点 "New +" → "Web Service"
+4. 选择仓库 `DengxiaoyuOVO/pyqzan`
+5. 配置：
+   - Build Command: `PUPPETEER_SKIP_DOWNLOAD=true npm install && npm run build:h5`
+   - Start Command: `node weinode/main.js`
+6. 点 "Create Web Service"，等几分钟上线
 
-点上方按钮 → 用 GitHub 登录 Vercel → 一路 Continue → Deploy，两分钟上线。部署后截图 + 获取公众号信息全部可用，零维护。
+部署后截图功能和获取公众号信息全部可用，零维护。
