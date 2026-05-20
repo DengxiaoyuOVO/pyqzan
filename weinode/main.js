@@ -22,9 +22,10 @@ app.use((req, res, next) => {
 
 app.use(express.static('public'))
 
+const builtInPath = path.join(__dirname, 'public-h5');
 const frontendPath = path.join(__dirname, '..', 'dist', 'build', 'h5');
 const devPath = path.join(__dirname, '..', 'dist', 'dev', 'h5');
-const staticPath = fs.existsSync(frontendPath) ? frontendPath : devPath;
+const staticPath = fs.existsSync(builtInPath) ? builtInPath : (fs.existsSync(frontendPath) ? frontendPath : devPath);
 app.use(express.static(staticPath));
 
 app.get(/^(?!\/(getWeiDate|uploadWorkPicture|deleteWorkPicture|static|emoticon))/i, (req, res) => {
