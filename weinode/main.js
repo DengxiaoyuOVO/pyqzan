@@ -33,4 +33,4 @@ app.get(/^(?!\/(getWeiDate|uploadWorkPicture|deleteWorkPicture|static|emoticon))
 
 router(app)
 
-let server = app.listen(3456);
+let server = app.listen(process.env.PORT || 3456);
