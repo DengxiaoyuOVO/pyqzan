@@ -43,28 +43,27 @@ export default {
     async fetchArticle() {
       const u = this.articleUrl.trim();
       if (!u) { uni.showToast({ title: "请粘贴文章链接", icon: "none" }); return; }
-      this.fetching = true;
-      uni.showLoading({ title: "抓取中..." });
-      try {
-        const r = await fetch("/api/wechat-fetch?url=" + encodeURIComponent(u));
-        const d = await r.json();
-        if (d.success && d.title) {
-          this.linkText = d.title;
-          if (d.cover) { this.linkImg = d.cover; }
-          uni.hideLoading(); uni.showToast({ title: "抓取成功", icon: "success" });
-          this.fetching = false; return;
-        }
-      } catch (e) {}
-      try {
-        const r2 = await fetch("/getWeiDate?url=" + encodeURIComponent(u));
-        const d2 = await r2.json();
-        if (d2.title) { this.linkText = d2.title; if (d2.imgUrl) { this.linkImg = d2.imgUrl; }
-          uni.hideLoading(); uni.showToast({ title: "抓取成功", icon: "success" });
-          this.fetching = false; return; }
-      } catch (e) {}
-      uni.hideLoading(); this.fetching = false;
-      uni.showToast({ title: "自动抓取失败，请手动填写", icon: "none" });
-    }, submit() {
+      const isLocal = window.location.hostname === 'localhost';
+      if (isLocal) {
+        this.fetching = true;
+        uni.showLoading({ title: "抓取中..." });
+        try {
+          const r = await fetch("/api/wechat-fetch?url=" + encodeURIComponent(u));
+          const d = await r.json();
+          if (d.success && d.title) {
+            this.linkText = d.title;
+            if (d.cover) { this.linkImg = d.cover; }
+            uni.hideLoading(); uni.showToast({ title: "获取成功", icon: "success" });
+            this.fetching = false; return;
+          }
+        } catch (e) {}
+        uni.hideLoading(); this.fetching = false;
+        uni.showToast({ title: "自动抓取失败，请手动填写", icon: "none" });
+      } else {
+        const returnUrl = encodeURIComponent(window.location.href);
+        window.location.href = 'https://pyqzan-fetcher.vercel.app/?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
+      }
+    },submit() {
       if (!this.linkText.trim()) { uni.showToast({ title: "请输入标题", icon: "none" }); return; }
       this.$refs.articlepopup.hide();
       this.$emit("submit", { linkText: this.linkText, linkImg: this.linkImg });

@@ -69,6 +69,8 @@ export default {
   onLoad(option) {
     this.isRulePopup = true;
     this.pageData.type = option.type;
+    if (option.title) { this.pageData.linkInfo.linkText = decodeURIComponent(option.title); }
+    if (option.cover) { this.pageData.linkInfo.linkImg = decodeURIComponent(option.cover); }
   },
   methods: {
     preImg(i) {
