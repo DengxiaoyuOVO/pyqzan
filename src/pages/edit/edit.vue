@@ -149,7 +149,7 @@ export default {
   onLoad(option) {
     this.pageData.type = option.type;
     if (option.title) { this.pageData.linkInfo.linkText = decodeURIComponent(option.title); }
-    if (option.cover) { this.pageData.linkInfo.linkImg = decodeURIComponent(option.cover); }
+    if (option.cover) { let cv=decodeURIComponent(option.cover); if(cv.startsWith('http')) cv='https://pyqzan.pages.dev/api/cover?url='+encodeURIComponent(cv); this.pageData.linkInfo.linkImg=cv; }
   },
   methods: {
     getTime(e) {

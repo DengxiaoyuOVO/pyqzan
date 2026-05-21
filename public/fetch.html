@@ -119,10 +119,10 @@ function chooseCover(){
 function goBack(){
   var t=document.getElementById('title').value.trim();
   if(!t){showToast('请输入标题');return}
-  var c=document.getElementById('cover').src;
+  var c=coverRawUrl||'';
   var back=returnUrl||'https://dengxiaoyuovo.github.io/pyqzan/#/pages/edit/edit?type=2';
   back+=(back.includes('?')?'&':'?')+'title='+encodeURIComponent(t);
-  if(c&&c.startsWith('data:'))back+='&cover='+encodeURIComponent(c);
+  if(c)back+='&cover='+encodeURIComponent(c);
   location.href=back;
 }
 
