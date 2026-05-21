@@ -61,7 +61,7 @@ export default {
         uni.showToast({ title: '自动抓取失败，请手动填写', icon: 'none' });
       } else {
         const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = 'https://pyqzan.pages.dev/?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
+        window.location.href = 'https://pyqzan.pages.dev/fetch.html?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
       }
     },submit() {
       if (!this.linkText.trim()) { uni.showToast({ title: "请输入标题", icon: "none" }); return; }
