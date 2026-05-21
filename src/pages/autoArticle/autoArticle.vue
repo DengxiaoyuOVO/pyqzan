@@ -48,13 +48,8 @@ export default {
   },
   onLoad(option) {
     this.domId = "#poster";
-    const app = getApp();
-    if (app.globalData.articleData) {
-      Object.assign(this.pageData, app.globalData.articleData);
-      delete app.globalData.articleData;
-    } else if (option.data) {
-      try { const d = JSON.parse(option.data); Object.assign(this.pageData, d); } catch(e) {}
-    }
+    const data = JSON.parse(option.data);
+    this.pageData = data;
   },
   methods: {
     handleRight(data) {
@@ -82,27 +77,6 @@ export default {
       try {
         const el = document.querySelector("#poster");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        const imgs = el.querySelectorAll("img");
-        for (let img of imgs) {
-          if (img.src && img.src.startsWith("http") && !img.src.startsWith(location.origin)) {
-            await new Promise((resolve) => {
-              let tmp = new Image();
-              tmp.crossOrigin = "anonymous";
-              tmp.onload = () => {
-                let cv = document.createElement("canvas");
-                cv.width = tmp.naturalWidth;
-                cv.height = tmp.naturalHeight;
-                cv.getContext("2d").drawImage(tmp, 0, 0);
-                try { img.src = cv.toDataURL("image/jpeg", 0.8); } catch(e) {}
-                resolve();
-              };
-              tmp.onerror = resolve;
-              tmp.src = img.src;
-            });
-          }
-        }
-        await new Promise(r => setTimeout(r, 100));
-
         const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
         this.renderUrl = canvas.toDataURL("image/png", 1);
         uni.hideToast();

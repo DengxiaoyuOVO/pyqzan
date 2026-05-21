@@ -117,7 +117,7 @@ export default {
         dian: 0,
         linkInfo: {
           linkText: "点击输入公众号文章描述",
-          linkImg: "/static/img/avatar.png",
+          linkImg: "/static/img/link-default.jpg",
         },
         article: {
           username: "",
@@ -149,7 +149,6 @@ export default {
   onLoad(option) {
     this.pageData.type = option.type;
     if (option.title) { this.pageData.linkInfo.linkText = decodeURIComponent(option.title); }
-    if (option.cover) { this.pageData.linkInfo.linkImg = decodeURIComponent(option.cover); }
     if (option.cover) { this.pageData.linkInfo.linkImg = decodeURIComponent(option.cover); }
   },
   methods: {
