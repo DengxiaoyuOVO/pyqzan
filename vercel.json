@@ -1,14 +1,1 @@
-{
-  "buildCommand": "PUPPETEER_SKIP_DOWNLOAD=true npm run build:h5",
-  "outputDirectory": "dist/build/h5",
-  "functions": {
-    "api/getWeiDate.js": {
-      "memory": 512,
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    { "source": "/getWeiDate", "destination": "/api/getWeiDate" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
-}
+﻿{"rewrites":[{"source":"/api/wechat-fetch","destination":"/api/wechat-fetch"}],"headers":[{"source":"/api/(.*)","headers":[{"key":"Access-Control-Allow-Origin","value":"*"},{"key":"Access-Control-Allow-Methods","value":"GET,OPTIONS"},{"key":"Access-Control-Allow-Headers","value":"*"}]}]}

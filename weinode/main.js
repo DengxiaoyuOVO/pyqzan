@@ -28,10 +28,14 @@ const devPath = path.join(__dirname, '..', 'dist', 'dev', 'h5');
 const staticPath = fs.existsSync(builtInPath) ? builtInPath : (fs.existsSync(frontendPath) ? frontendPath : devPath);
 app.use(express.static(staticPath));
 
-app.get(/^(?!\/(getWeiDate|uploadWorkPicture|deleteWorkPicture|static|emoticon))/i, (req, res) => {
+require("./proxy-worker")(app);
+
+app.get(/^(?!\/(getWeiDate|uploadWorkPicture|deleteWorkPicture|static|emoticon|api))/i, (req, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 
+require("./proxy-worker")(app);
 router(app)
 
+router(app);
 let server = app.listen(process.env.PORT || 3456);

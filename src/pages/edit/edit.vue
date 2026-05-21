@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <view class="pageedit">
     <weiarticle-popup
       :isShow="isShowArticle"
@@ -148,6 +148,8 @@ export default {
   },
   onLoad(option) {
     this.pageData.type = option.type;
+    if (option.title) { this.pageData.linkInfo.linkText = decodeURIComponent(option.title); }
+    if (option.cover) { this.pageData.linkInfo.linkImg = decodeURIComponent(option.cover); }
   },
   methods: {
     getTime(e) {

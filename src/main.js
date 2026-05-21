@@ -1,4 +1,5 @@
 import Vue from 'vue'
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{scope:'/pyqzan/'}).then(function(r){console.log('SW registered:',r.scope)}).catch(function(e){console.error('SW failed:',e)})})}
 import App from './App'
 import './uni.promisify.adaptor'
 

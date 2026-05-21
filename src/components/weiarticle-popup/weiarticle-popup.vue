@@ -1,101 +1,91 @@
 <template>
   <popup ref="articlepopup" type="fadeInMiddle" @hide="close">
     <view class="weiarticle_popup">
-      <view class="popup_title"> 获取公众号文章 </view>
-      <input
-        class="popup_input"
-        type="text"
-        v-model="articleUrl"
-        placeholder="请输入公众号文章链接"
-      />
-      <view class="popup_btn" @click="getArticle"> 获取 </view>
+      <view class="popup_title"> 文章信息 </view>
+      
+      <view class="url_row">
+        <input class="popup_input url_input" type="text" v-model="articleUrl" placeholder="粘贴微信公众号文章链接..." />
+        <view class="fetch_btn" @click="fetchArticle">{{ fetching ? "抓取中..." : "获取" }}</view>
+      </view>
+      
+      <view class="divider"><text class="divider_text">或手动填写</text></view>
+      
+      <input class="popup_input" type="text" v-model="linkText" placeholder="输入文章标题" />
+      
+      <view class="cover_row">
+        <image class="cover_preview" :src="linkImg" mode="aspectFill" @click="chooseImg"></image>
+        <text class="cover_tip" @click="chooseImg">点击选择封面图</text>
+      </view>
+      
+      <view class="popup_btn" @click="submit"> 确定 </view>
     </view>
   </popup>
 </template>
 
 <script>
+const WORKER_URL = 'https://wechat-fetcher.1843262744.workers.dev';
+
 export default {
   name: "wei-article",
   data() {
-    return {
-      articleUrl: "",
-    };
+    return { articleUrl: "", fetching: false, linkText: "", linkImg: "/static/img/avatar.png" };
   },
-  props: {
-    isShow: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  props: { isShow: { type: Boolean, default: false } },
   watch: {
-    isShow(newVal, old) {
+    isShow(newVal) {
       if (newVal) {
+        this.articleUrl = ""; this.linkText = ""; this.linkImg = "/static/img/avatar.png";
         this.$refs.articlepopup.show();
-      } else {
-        this.$refs.articlepopup.hide();
-      }
+      } else { this.$refs.articlepopup.hide(); }
     },
   },
   methods: {
-    async getArticle() {
-      if (this.articleUrl.length == 0) {
-        uni.showToast({ title: "请输入链接", icon: "none" });
-        return;
-      }
-      uni.showLoading({ title: "正在获取中...", mask: true });
+    async fetchArticle() {
+      const u = this.articleUrl.trim();
+      if (!u) { uni.showToast({ title: "请粘贴文章链接", icon: "none" }); return; }
+      this.fetching = true;
+      uni.showLoading({ title: "抓取中..." });
       try {
-        const res = await this.$api.getArticle({ url: this.articleUrl });
-        const linkData = {
-          linkText: res.title || "未获取到标题",
-          linkImg: res.imgUrl || "/static/img/avatar.png",
-        };
-        uni.hideLoading();
-        this.articleUrl = "";
-        this.$refs.articlepopup.hide();
-        this.$emit("submit", linkData);
-      } catch(e) {
-        uni.hideLoading();
-        uni.showToast({ title: "获取失败，请检查链接或网络", icon: "none", duration: 3000 });
-      }
+        const r = await fetch("/api/wechat-fetch?url=" + encodeURIComponent(u));
+        const d = await r.json();
+        if (d.success && d.title) {
+          this.linkText = d.title;
+          if (d.cover) { this.linkImg = d.cover; }
+          uni.hideLoading(); uni.showToast({ title: "抓取成功", icon: "success" });
+          this.fetching = false; return;
+        }
+      } catch (e) {}
+      try {
+        const r2 = await fetch("/getWeiDate?url=" + encodeURIComponent(u));
+        const d2 = await r2.json();
+        if (d2.title) { this.linkText = d2.title; if (d2.imgUrl) { this.linkImg = d2.imgUrl; }
+          uni.hideLoading(); uni.showToast({ title: "抓取成功", icon: "success" });
+          this.fetching = false; return; }
+      } catch (e) {}
+      uni.hideLoading(); this.fetching = false;
+      uni.showToast({ title: "自动抓取失败，请手动填写", icon: "none" });
+    }, submit() {
+      if (!this.linkText.trim()) { uni.showToast({ title: "请输入标题", icon: "none" }); return; }
+      this.$refs.articlepopup.hide();
+      this.$emit("submit", { linkText: this.linkText, linkImg: this.linkImg });
     },
-    close() {
-      this.$emit("close");
-    },
+    close() { this.$emit("close"); },
   },
 };
 </script>
 
 <style lang="scss">
-.weiarticle_popup {
-  width: 600upx;
-  height: 100%;
-  padding: 20upx;
-  border-radius: 10upx;
-  background-color: #ffffff;
-
-  .popup_title {
-    text-align: center;
-    font-size: 34upx;
-    font-weight: 900;
-    margin-bottom: 40upx;
-    color: var(--green);
-  }
-
-  .popup_input {
-    font-size: 26upx;
-    padding-bottom: 10upx;
-    border-bottom: 2upx solid var(--green);
-  }
-
-  .popup_btn {
-    margin: 40upx auto 0;
-    font-size: 30upx;
-    width: 120upx;
-    text-align: center;
-    border-radius: 5px;
-    background-color: var(--green);
-    padding: 4upx 10upx;
-    color: white;
-  }
+.weiarticle_popup { width: 640upx; padding: 30upx; border-radius: 10upx; background-color: #fff;
+  .popup_title { text-align: center; font-size: 34upx; font-weight: 900; margin-bottom: 20upx; color: #1677ff; }
+  .url_row { display: flex; gap: 10upx; margin-bottom: 10upx; }
+  .url_input { flex: 1; margin-bottom: 0; }
+  .fetch_btn { width: 120upx; height: 70upx; line-height: 70upx; text-align: center; background-color: #1677ff; color: #fff; border-radius: 8upx; font-size: 26upx; }
+  .divider { text-align: center; margin: 15upx 0; }
+  .divider_text { font-size: 22upx; color: #999; background: #fff; padding: 0 20upx; }
+  .popup_input { border: 1px solid #ddd; border-radius: 8upx; padding: 20upx; font-size: 28upx; margin-bottom: 20upx; }
+  .cover_row { display: flex; align-items: center; margin-bottom: 30upx; gap: 20upx; }
+  .cover_preview { width: 120upx; height: 120upx; border-radius: 8upx; border: 1px solid #ddd; }
+  .cover_tip { font-size: 26upx; color: #1677ff; text-decoration: underline; }
+  .popup_btn { margin: 0 auto; font-size: 30upx; width: 200upx; text-align: center; border-radius: 10upx; background-color: #1677ff; padding: 16upx 0; color: #fff; }
 }
 </style>
