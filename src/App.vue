@@ -1,5 +1,8 @@
-<script>
+﻿<script>
 	export default {
+		globalData: {
+			isTip: true
+		},
 		onLaunch: function() {
 			console.log('App Launch')
 		},

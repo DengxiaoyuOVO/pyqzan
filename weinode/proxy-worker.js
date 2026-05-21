@@ -73,6 +73,33 @@ function downloadImage(imgUrl, callback) {
 }
 
 module.exports = function(app) {
+  app.get('/api/cover', (req, res) => {
+    const imgUrl = req.query.url;
+    if (!imgUrl) return res.status(400).send('missing url');
+    let url = imgUrl;
+    if (!url.startsWith('http')) url = 'https:' + url;
+    const opts = {
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+        'Referer': 'https://mp.weixin.qq.com/'
+      }
+    };
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Cache-Control', 'public, max-age=86400');
+    https.get(url, opts, (pr) => {
+      if (pr.statusCode >= 300 && pr.statusCode < 400 && pr.headers.location) {
+        const redirectUrl = pr.headers.location;
+        https.get(redirectUrl, opts, (pr2) => {
+          res.set('Content-Type', pr2.headers['content-type'] || 'image/jpeg');
+          pr2.pipe(res);
+        }).on('error', () => res.status(502).send('fetch failed'));
+      } else {
+        res.set('Content-Type', pr.headers['content-type'] || 'image/jpeg');
+        pr.pipe(res);
+      }
+    }).on('error', () => res.status(502).send('fetch failed'));
+  });
+  
   app.get('/api/wechat-fetch', (req, res) => {
     const t = req.query.url;
     if (!t) return res.json({ error: 'missing url' });

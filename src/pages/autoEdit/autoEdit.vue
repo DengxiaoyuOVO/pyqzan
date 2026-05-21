@@ -109,15 +109,11 @@ export default {
       this.status.item1 = value > 0;
     },
     async send(userinfo) {
-      let data = JSON.stringify(this.pageData);
+      getApp().globalData.articleData = this.pageData;
       if (this.pageData.type == 2) {
-        uni.navigateTo({
-          url: `../autoMain/autoMain?data=${data}`,
-        });
+        uni.navigateTo({ url: '../autoMain/autoMain' });
       } else {
-        uni.navigateTo({
-          url: `../autoArticle/autoArticle?data=${data}`,
-        });
+        uni.navigateTo({ url: '../autoArticle/autoArticle' });
       }
     },
   },

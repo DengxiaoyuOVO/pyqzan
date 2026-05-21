@@ -181,17 +181,6 @@ export default {
       try {
         const el = document.querySelector("#poster");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        const imgs = el.querySelectorAll("img");
-        for (let img of imgs) {
-          if (img.src && (img.src.startsWith("http://") || img.src.startsWith("https://")) && !img.src.startsWith(location.origin)) {
-            await new Promise((resolve) => {
-              let t = new Image(); t.crossOrigin = "anonymous";
-              t.onload = () => { let cv = document.createElement("canvas"); cv.width = t.naturalWidth; cv.height = t.naturalHeight; cv.getContext("2d").drawImage(t, 0, 0); try { img.src = cv.toDataURL("image/jpeg", 0.85) } catch(e) {}; resolve(); };
-              t.onerror = resolve; t.src = img.src;
-            });
-          }
-        }
-        await new Promise(r => setTimeout(r, 100));
         const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
         this.renderUrl = canvas.toDataURL("image/png", 1);
         uni.hideToast();

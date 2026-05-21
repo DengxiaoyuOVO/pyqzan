@@ -20,7 +20,6 @@
           class="linkImg"
           :src="pageData.linkInfo.linkImg"
           mode="aspectFill"
-          crossorigin="anonymous"
         ></image>
         <text
           class="linkText"

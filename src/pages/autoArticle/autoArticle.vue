@@ -48,8 +48,13 @@ export default {
   },
   onLoad(option) {
     this.domId = "#poster";
-    const data = JSON.parse(option.data);
-    this.pageData = data;
+    const app = getApp();
+    if (app.globalData.articleData) {
+      Object.assign(this.pageData, app.globalData.articleData);
+      delete app.globalData.articleData;
+    } else if (option.data) {
+      try { const d = JSON.parse(option.data); Object.assign(this.pageData, d); } catch(e) {}
+    }
   },
   methods: {
     handleRight(data) {

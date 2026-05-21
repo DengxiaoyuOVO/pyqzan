@@ -47,8 +47,14 @@
 			}
 		},
 		onLoad(options) {
-			if (options.data) {
-				this.pageData = JSON.parse(options.data)
+			try {
+				const app = getApp();
+				if (app.globalData.articleData) {
+					Object.assign(this.pageData, app.globalData.articleData);
+					delete app.globalData.articleData;
+				}
+			} catch(e) {
+				if (options.data) { try { const d = JSON.parse(options.data); Object.assign(this.pageData, d); } catch(e) {} }
 			}
 		},
 		mounted() {
