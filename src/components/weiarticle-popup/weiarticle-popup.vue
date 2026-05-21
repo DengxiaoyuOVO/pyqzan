@@ -42,26 +42,26 @@ export default {
   methods: {
     async fetchArticle() {
       const u = this.articleUrl.trim();
-      if (!u) { uni.showToast({ title: "请粘贴文章链接", icon: "none" }); return; }
+      if (!u) { uni.showToast({ title: '请粘贴文章链接', icon: 'none' }); return; }
       const isLocal = window.location.hostname === 'localhost';
       if (isLocal) {
         this.fetching = true;
-        uni.showLoading({ title: "抓取中..." });
+        uni.showLoading({ title: '抓取中...' });
         try {
           const r = await fetch("/api/wechat-fetch?url=" + encodeURIComponent(u));
           const d = await r.json();
           if (d.success && d.title) {
             this.linkText = d.title;
             if (d.cover) { this.linkImg = d.cover; }
-            uni.hideLoading(); uni.showToast({ title: "获取成功", icon: "success" });
+            uni.hideLoading(); uni.showToast({ title: '获取成功', icon: 'success' });
             this.fetching = false; return;
           }
         } catch (e) {}
         uni.hideLoading(); this.fetching = false;
-        uni.showToast({ title: "自动抓取失败，请手动填写", icon: "none" });
+        uni.showToast({ title: '自动抓取失败，请手动填写', icon: 'none' });
       } else {
         const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = 'https://pyqzan-fetcher.vercel.app/?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
+        window.location.href = 'https://pyqzan-fetcher.pages.dev/?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
       }
     },submit() {
       if (!this.linkText.trim()) { uni.showToast({ title: "请输入标题", icon: "none" }); return; }
