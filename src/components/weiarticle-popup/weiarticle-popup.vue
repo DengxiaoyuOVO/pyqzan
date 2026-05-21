@@ -28,13 +28,13 @@ const WORKER_URL = 'https://wechat-fetcher.1843262744.workers.dev';
 export default {
   name: "wei-article",
   data() {
-    return { articleUrl: "", fetching: false, linkText: "", linkImg: "/static/img/avatar.png" };
+    return { articleUrl: "", fetching: false, linkText: "", linkImg: "/static/img/link-default.jpg" };
   },
   props: { isShow: { type: Boolean, default: false } },
   watch: {
     isShow(newVal) {
       if (newVal) {
-        this.articleUrl = ""; this.linkText = ""; this.linkImg = "/static/img/avatar.png";
+        this.articleUrl = ""; this.linkText = ""; this.linkImg = "/static/img/link-default.jpg";
         this.$refs.articlepopup.show();
       } else { this.$refs.articlepopup.hide(); }
     },
