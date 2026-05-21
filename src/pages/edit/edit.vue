@@ -152,10 +152,21 @@ export default {
     if (option.cover) {
   let cv = decodeURIComponent(option.cover);
   if (cv.startsWith('http')) {
-    let api = 'https://pyqzan.pages.dev/api/cover?url=' + encodeURIComponent(cv);
-    fetch(api).then(r => r.json()).then(d => {
-      if (d.data) this.pageData.linkInfo.linkImg = d.data;
-    }).catch(() => {});
+    let proxyUrl = 'https://pyqzan.pages.dev/api/cover?url=' + encodeURIComponent(cv);
+    let img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      let canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      let ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      this.pageData.linkInfo.linkImg = canvas.toDataURL('image/jpeg', 0.8);
+    };
+    img.onerror = () => {
+      uni.showToast({ title: '封面加载失败，请手动上传', icon: 'none' });
+    };
+    img.src = proxyUrl;
   } else {
     this.pageData.linkInfo.linkImg = cv;
   }
