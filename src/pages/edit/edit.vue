@@ -117,7 +117,7 @@ export default {
         dian: 0,
         linkInfo: {
           linkText: "点击输入公众号文章描述",
-          linkImg: "/static/img/avatar.png",
+          linkImg: "/static/img/link-default.jpg",
         },
         article: {
           username: "",
