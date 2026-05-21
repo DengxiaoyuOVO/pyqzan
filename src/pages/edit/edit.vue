@@ -220,6 +220,31 @@ export default {
       this.isShowUserInfo = true;
     },
     async goArticle(userinfo) {
+      if (this.pageData.type == 1 && this.pageData.linkInfo.linkImg && this.pageData.linkInfo.linkImg.startsWith("http")) {
+        uni.showLoading({ title: "处理封面..." });
+        try {
+          let url = this.pageData.linkInfo.linkImg;
+          if (url.includes("mmbiz.qpic.cn") || url.includes("mp.weixin.qq.com")) {
+            url = "https://pyqzan.pages.dev/api/cover?url=" + encodeURIComponent(url);
+          }
+          await new Promise((resolve) => {
+            let img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+              let cv = document.createElement("canvas");
+              cv.width = img.naturalWidth;
+              cv.height = img.naturalHeight;
+              cv.getContext("2d").drawImage(img, 0, 0);
+              try { this.pageData.linkInfo.linkImg = cv.toDataURL("image/jpeg", 0.8); } catch(e) {}
+              resolve();
+            };
+            img.onerror = resolve;
+            img.src = url;
+          });
+        } catch(e) {}
+        uni.hideLoading();
+      }
+
       this.pageData.article.contentText = await this.$util.emoticonReplace(
         this.pageData.article.contentText
       );
