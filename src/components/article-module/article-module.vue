@@ -16,11 +16,11 @@
       ></view>
 
       <view class="pypLink" v-if="pageData.type == 1">
-        <image
+        <img
           class="linkImg"
           :src="pageData.linkInfo.linkImg"
-          mode="aspectFill" crossorigin="anonymous"
-        ></image>
+          crossorigin="anonymous"
+        />
         <text
           class="linkText"
           style="height: auto"
@@ -181,6 +181,7 @@ export default {
         width: 90upx;
         height: 90upx;
         margin-right: 10upx;
+        object-fit: cover;
       }
 
       .linkText {
