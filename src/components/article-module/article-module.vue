@@ -19,7 +19,7 @@
         <img
           class="linkImg"
           :src="pageData.linkInfo.linkImg"
-          :crossorigin="pageData.linkInfo.linkImg && pageData.linkInfo.linkImg.startsWith("data:") ? undefined : "anonymous""
+          crossorigin="anonymous"
         />
         <text
           class="linkText"
