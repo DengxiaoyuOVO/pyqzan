@@ -149,7 +149,7 @@ export default {
   onLoad(option) {
     this.pageData.type = option.type;
     if (option.title) { this.pageData.linkInfo.linkText = decodeURIComponent(option.title); }
-    if (option.cover) { let cv=decodeURIComponent(option.cover); if(cv.startsWith("http")) cv="https://pyqzan.pages.dev/api/cover?url="+encodeURIComponent(cv); this.pageData.linkInfo.linkImg=cv; }
+    if (option.cover) { let cv=decodeURIComponent(option.cover); if(cv.startsWith("data:")) { this.pageData.linkInfo.linkImg=cv; } else if(cv.startsWith("http")) { cv="https://pyqzan.pages.dev/api/cover?url="+encodeURIComponent(cv); this.pageData.linkInfo.linkImg=cv; } else { this.pageData.linkInfo.linkImg=cv; } }
   },
   methods: {
     getTime(e) {
