@@ -19,7 +19,7 @@
         <image
           class="linkImg"
           :src="pageData.linkInfo.linkImg"
-          mode="aspectFill"
+          mode="aspectFill" crossorigin="anonymous"
         ></image>
         <text
           class="linkText"
