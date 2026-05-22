@@ -87,6 +87,7 @@ async function doFetch(){
     btn.disabled = false; btn.textContent = '抓取';
     if(d.error){showToast('抓取失败: '+d.error);document.getElementById('result').classList.add('show');return}
     document.getElementById('title').value = d.title || '';
+    coverRawUrl = d.cover || "";
     if(d.coverBase64){
       document.getElementById('cover').src = d.coverBase64;
       document.getElementById('cover').style.display = 'block';
