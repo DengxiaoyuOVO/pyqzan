@@ -18,23 +18,65 @@
 			}
 		},
 		methods: {
-			async createImg() {
+						async createImg() {
 				try {
-					this.showLoading()
-					const timeout = setTimeout(async ()=> {
-						const shareContent = document.querySelector(this.domId);
-						const canvas = await html2canvas(shareContent,{
-							width: shareContent.offsetWidth,//设置canvas尺寸与所截图尺寸相同，防止白边
-							height: shareContent.offsetHeight,//防止白边
-							logging: true,
-							useCORS: true
-						});
-						const base64 = canvas.toDataURL('image/jpeg', 1);
-						this.renderFinish(base64)
-						clearTimeout(timeout);
-					}, 100);
+					this.showLoading();
+					const shareContent = document.querySelector(this.domId);
+					
+					// Convert all non-data-URL images to data URLs
+					const images = shareContent.querySelectorAll('img');
+					for (const img of images) {
+						const src = img.getAttribute('src') || img.src;
+						if (!src || src.startsWith('data:')) continue;
+						try {
+							const proxy = new Image();
+							proxy.crossOrigin = 'anonymous';
+							await new Promise((resolve, reject) => {
+								proxy.onload = resolve;
+								proxy.onerror = reject;
+								proxy.src = src;
+							});
+							const cvs = document.createElement('canvas');
+							cvs.width = proxy.naturalWidth;
+							cvs.height = proxy.naturalHeight;
+							cvs.getContext('2d').drawImage(proxy, 0, 0);
+							img.src = cvs.toDataURL('image/jpeg', 0.9);
+							img.removeAttribute('crossorigin');
+						} catch(e) {
+							// If proxy load fails, try direct draw (same-origin only)
+							try {
+								if (img.complete && img.naturalWidth) {
+									const cvs = document.createElement('canvas');
+									cvs.width = img.naturalWidth;
+									cvs.height = img.naturalHeight;
+									cvs.getContext('2d').drawImage(img, 0, 0);
+									img.src = cvs.toDataURL('image/jpeg', 0.9);
+									img.removeAttribute('crossorigin');
+								}
+							} catch(e2) {}
+						}
+					}
+					
+					// Remove crossorigin from data URL images
+					for (const img of images) {
+						if (img.src.startsWith('data:')) {
+							img.removeAttribute('crossorigin');
+						}
+					}
+					
+					await new Promise(r => setTimeout(r, 100));
+					
+					const canvas = await html2canvas(shareContent, {
+						width: shareContent.offsetWidth,
+						height: shareContent.offsetHeight,
+						logging: false,
+						useCORS: false,
+						allowTaint: false
+					});
+					const base64 = canvas.toDataURL('image/jpeg', 1);
+					this.renderFinish(base64);
 				} catch(error){
-					console.log(error)
+					console.log(error);
 				}
 			},
 			async renderFinish(base64) {
