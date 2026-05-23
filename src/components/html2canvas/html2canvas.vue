@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<view>
 		<view class="html2canvas" :prop="domId">
 			<slot></slot>
@@ -19,7 +19,7 @@
 				try {
 					this.showLoading();
 					const el = document.querySelector(".canbox") || document.querySelector("#main");
-					// Replace cover img with canvas
+					// 找到封面 img，替换为 canvas
 					const img = el.querySelector("img.linkImg") || el.querySelector("img[src^='data:']");
 					let backup = null;
 					if (img && img.src && img.src.startsWith('data:')) {
@@ -37,8 +37,12 @@
 							img.parentNode.removeChild(img);
 						}
 					}
-					const canvas = await html2canvas(el, { useCORS: false, allowTaint: false });
-					// Restore
+					const canvas = await html2canvas(el, {
+						useCORS: false,
+						allowTaint: false,
+						foreignObjectRendering: true
+					});
+					// 恢复原 img
 					if (backup) {
 						const cvs = backup.parent.querySelectorAll('canvas');
 						for (const cv of cvs) {

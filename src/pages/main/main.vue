@@ -23,12 +23,20 @@
             textColor="#fff"
           />
         </block>
-        <view class="content">
+        <view class="content" v-if="pageData.article.pictureList && pageData.article.pictureList[0]">
           <image
             :src="pageData.article.pictureList[0]"
             mode="widthFix"
             class="con_img"
           ></image>
+        </view>
+        <!-- 公众号文章链接卡片（封面+标题） -->
+        <view class="linkCard" v-if="pageData.type == 2 && pageData.linkInfo">
+          <img
+            class="linkImg"
+            :src="pageData.linkInfo.linkImg"
+          />
+          <text class="linkTitle">{{ pageData.linkInfo.linkText }}</text>
         </view>
         <view class="boottom">
           <view class="boot_text" v-html="pageData.article.contentText"></view>
@@ -117,8 +125,8 @@ export default {
       try {
         const el = document.querySelector(".canbox") || document.querySelector("#main");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        // Replace cover img with canvas so html2canvas captures it natively
-        const img = el.querySelector("img.linkImg") || el.querySelector("img[src^='data:']");
+        // 找到封面 img，替换为 canvas（html2canvas 对 canvas 支持完美）
+        const img = el.querySelector(`img.linkImg`) || el.querySelector(`img[src^="""data:"""]`);
         let backup = null;
         if (img && img.src && img.src.startsWith("data:")) {
           const tmp = new Image();
@@ -136,8 +144,14 @@ export default {
           }
         }
         const scale = Math.max(window.devicePixelRatio || 1, 2) * 2;
-        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale });
-        // Restore original img
+        const canvas = await html2canvas(el, {
+          width: el.offsetWidth,
+          height: el.offsetHeight,
+          useCORS: false,
+          scale,
+          foreignObjectRendering: true
+        });
+        // 恢复原 img
         if (backup) {
           const cvs = backup.parent.querySelectorAll("canvas");
           for (const cv of cvs) {
@@ -194,6 +208,33 @@ export default {
 
       .con_img {
         width: 100%;
+      }
+    }
+
+    .linkCard {
+      display: flex;
+      align-items: center;
+      background-color: #1a1a1a;
+      padding: 12upx 20upx;
+
+      .linkImg {
+        width: 90upx;
+        height: 90upx;
+        margin-right: 15upx;
+        object-fit: cover;
+        border-radius: 4upx;
+      }
+
+      .linkTitle {
+        flex: 1;
+        font-size: 26upx;
+        color: #ccc;
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
       }
     }
 
