@@ -18,11 +18,11 @@
 			async createImg() {
 				try {
 					this.showLoading();
-					const el = document.querySelector(this.domId);
+					const el = document.querySelector(".canbox");
 					// Hide cover, composite manually
-					const cover = el.querySelector("img[src^='data:']");
+					const cover = el.querySelector("img.linkImg");
 					let ci = null;
-					if (cover) {
+					if (cover && cover.src) {
 						const cr = cover.getBoundingClientRect();
 						const er = el.getBoundingClientRect();
 						ci = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };

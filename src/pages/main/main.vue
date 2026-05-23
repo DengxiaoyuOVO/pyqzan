@@ -115,23 +115,24 @@ export default {
     async doSave() {
       uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
       try {
-        const el = document.querySelector("#poster");
+        const el = document.querySelector(".canbox");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        // Hide cover image, composite manually after screenshot
-        const cover = el.querySelector("img[src^='data:']");
+        const scale = Math.max(window.devicePixelRatio || 1, 2) * 2;
+        // Hide cover, composite manually after screenshot
+        const cover = el.querySelector("img.linkImg");
         let coverInfo = null;
-        if (cover) {
+        if (cover && cover.src) {
           const cr = cover.getBoundingClientRect();
           const er = el.getBoundingClientRect();
           coverInfo = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };
           cover.style.visibility = "hidden";
         }
-        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale });
         if (coverInfo) {
           const ci = new Image();
           await new Promise((resolve) => { ci.onload = resolve; ci.onerror = resolve; ci.src = coverInfo.src; });
           if (ci.complete && ci.naturalWidth) {
-            canvas.getContext("2d").drawImage(ci, coverInfo.x, coverInfo.y, coverInfo.w, coverInfo.h);
+            canvas.getContext("2d").drawImage(ci, coverInfo.x * scale, coverInfo.y * scale, coverInfo.w * scale, coverInfo.h * scale);
           }
           coverInfo.img.style.visibility = "";
         }
