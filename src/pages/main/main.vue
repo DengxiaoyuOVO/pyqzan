@@ -117,7 +117,24 @@ export default {
       try {
         const el = document.querySelector("#poster");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: true, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        // Hide cover image, composite manually after screenshot
+        const cover = el.querySelector("img[src^='data:']");
+        let coverInfo = null;
+        if (cover) {
+          const cr = cover.getBoundingClientRect();
+          const er = el.getBoundingClientRect();
+          coverInfo = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };
+          cover.style.visibility = "hidden";
+        }
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale: Math.max(window.devicePixelRatio || 1, 2) * 2 });
+        if (coverInfo) {
+          const ci = new Image();
+          await new Promise((resolve) => { ci.onload = resolve; ci.onerror = resolve; ci.src = coverInfo.src; });
+          if (ci.complete && ci.naturalWidth) {
+            canvas.getContext("2d").drawImage(ci, coverInfo.x, coverInfo.y, coverInfo.w, coverInfo.h);
+          }
+          coverInfo.img.style.visibility = "";
+        }
         this.renderUrl = canvas.toDataURL("image/png", 1);
         uni.hideToast();
         this.isShowRender = true;

@@ -19,10 +19,24 @@
 				try {
 					this.showLoading();
 					const el = document.querySelector(this.domId);
-					const canvas = await html2canvas(el, {
-						useCORS: false,
-						allowTaint: false
-					});
+					// Hide cover, composite manually
+					const cover = el.querySelector("img[src^='data:']");
+					let ci = null;
+					if (cover) {
+						const cr = cover.getBoundingClientRect();
+						const er = el.getBoundingClientRect();
+						ci = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };
+						cover.style.visibility = 'hidden';
+					}
+					const canvas = await html2canvas(el, { useCORS: false, allowTaint: false });
+					if (ci) {
+						const img = new Image();
+						await new Promise((r) => { img.onload = r; img.onerror = r; img.src = ci.src; });
+						if (img.complete && img.naturalWidth) {
+							canvas.getContext('2d').drawImage(img, ci.x, ci.y, ci.w, ci.h);
+						}
+						ci.img.style.visibility = '';
+					}
 					const base64 = canvas.toDataURL('image/jpeg', 1);
 					this.renderFinish(base64);
 				} catch (e) {
