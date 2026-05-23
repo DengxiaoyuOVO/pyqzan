@@ -80,6 +80,7 @@ export default {
         navbar: false,
         navbarTime: "",
         dian: 0,
+        linkInfo: { linkText: '', linkImg: '' },
         article: {
           username: "",
           avatar: "",
