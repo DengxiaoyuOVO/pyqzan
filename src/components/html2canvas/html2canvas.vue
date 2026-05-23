@@ -18,50 +18,15 @@
 			}
 		},
 		methods: {
-						async createImg() {
+									async createImg() {
 				try {
 					this.showLoading();
 					const shareContent = document.querySelector(this.domId);
 					
-					// Convert all non-data-URL images to data URLs
+					// Remove crossorigin from all images to avoid browser blocking
 					const images = shareContent.querySelectorAll('img');
 					for (const img of images) {
-						const src = img.getAttribute('src') || img.src;
-						if (!src || src.startsWith('data:')) continue;
-						try {
-							const proxy = new Image();
-							proxy.crossOrigin = 'anonymous';
-							await new Promise((resolve, reject) => {
-								proxy.onload = resolve;
-								proxy.onerror = reject;
-								proxy.src = src;
-							});
-							const cvs = document.createElement('canvas');
-							cvs.width = proxy.naturalWidth;
-							cvs.height = proxy.naturalHeight;
-							cvs.getContext('2d').drawImage(proxy, 0, 0);
-							img.src = cvs.toDataURL('image/jpeg', 0.9);
-							img.removeAttribute('crossorigin');
-						} catch(e) {
-							// If proxy load fails, try direct draw (same-origin only)
-							try {
-								if (img.complete && img.naturalWidth) {
-									const cvs = document.createElement('canvas');
-									cvs.width = img.naturalWidth;
-									cvs.height = img.naturalHeight;
-									cvs.getContext('2d').drawImage(img, 0, 0);
-									img.src = cvs.toDataURL('image/jpeg', 0.9);
-									img.removeAttribute('crossorigin');
-								}
-							} catch(e2) {}
-						}
-					}
-					
-					// Remove crossorigin from data URL images
-					for (const img of images) {
-						if (img.src.startsWith('data:')) {
-							img.removeAttribute('crossorigin');
-						}
+						img.removeAttribute('crossorigin');
 					}
 					
 					await new Promise(r => setTimeout(r, 100));
