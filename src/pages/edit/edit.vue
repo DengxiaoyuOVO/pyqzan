@@ -205,14 +205,14 @@ export default {
       this.pageData.article.username = userinfo.username;
       this.pageData.article.avatar = userinfo.avatar;
       this.pageData.article.date = userinfo.date;
-      let data = JSON.stringify(this.pageData);
+      const app = getApp(); app.globalData.articleData = JSON.parse(JSON.stringify(this.pageData));
       if (this.pageData.type == 2) {
         uni.navigateTo({
-          url: `../main/main?data=${data}`,
+          url: '../main/main',
         });
       } else {
         uni.navigateTo({
-          url: `../article/article?data=${data}`,
+          url: '../article/article',
         });
       }
     },

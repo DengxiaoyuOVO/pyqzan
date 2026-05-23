@@ -114,8 +114,8 @@ export default {
   },
   onLoad(option) {
     this.domId = "#poster";
-    const data = JSON.parse(option.data);
-    this.pageData = data;
+    const app = getApp();
+    if (app.globalData.articleData) { this.pageData = app.globalData.articleData; delete app.globalData.articleData; } else if (option.data) { this.pageData = JSON.parse(option.data); }
   },
   methods: {
     handleRight(data) {
