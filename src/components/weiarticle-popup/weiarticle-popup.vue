@@ -39,31 +39,32 @@ export default {
       } else { this.$refs.articlepopup.hide(); }
     },
   },
-  methods: {
+    methods: {
     async fetchArticle() {
       const u = this.articleUrl.trim();
       if (!u) { uni.showToast({ title: '请粘贴文章链接', icon: 'none' }); return; }
-      const isLocal = window.location.hostname === 'localhost';
-      if (isLocal) {
-        this.fetching = true;
-        uni.showLoading({ title: '抓取中...' });
-        try {
-          const r = await fetch("/api/wechat-fetch?url=" + encodeURIComponent(u));
-          const d = await r.json();
-          if (d.success && d.title) {
-            this.linkText = d.title;
-            if (d.cover) { this.linkImg = d.cover; }
-            uni.hideLoading(); uni.showToast({ title: '获取成功', icon: 'success' });
-            this.fetching = false; return;
-          }
-        } catch (e) {}
-        uni.hideLoading(); this.fetching = false;
-        uni.showToast({ title: '自动抓取失败，请手动填写', icon: 'none' });
-      } else {
-        const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = 'https://pyqzan.pages.dev/fetch.html?url=' + encodeURIComponent(u) + '&return=' + returnUrl;
+      this.fetching = true;
+      uni.showLoading({ title: '抓取中...' });
+      try {
+        const api = 'https://pyqzan.pages.dev/api/wechat-fetch?url=' + encodeURIComponent(u);
+        const r = await fetch(api);
+        const d = await r.json();
+        uni.hideLoading();
+        this.fetching = false;
+        if (d.success && d.title) {
+          this.linkText = d.title;
+          this.linkImg = d.coverBase64 || d.cover || this.linkImg;
+          uni.showToast({ title: '获取成功', icon: 'success' });
+          return;
+        }
+        uni.showToast({ title: '抓取失败，请手动填写', icon: 'none' });
+      } catch (e) {
+        uni.hideLoading();
+        this.fetching = false;
+        uni.showToast({ title: '网络错误，请手动填写', icon: 'none' });
       }
-    },submit() {
+    },
+submit() {
       if (!this.linkText.trim()) { uni.showToast({ title: "请输入标题", icon: "none" }); return; }
       this.$refs.articlepopup.hide();
       this.$emit("submit", { linkText: this.linkText, linkImg: this.linkImg });
