@@ -18,24 +18,34 @@
 			async createImg() {
 				try {
 					this.showLoading();
-					const el = document.querySelector(".canbox");
-					// Hide cover, composite manually
-					const cover = el.querySelector("img.linkImg");
-					let ci = null;
-					if (cover && cover.src) {
-						const cr = cover.getBoundingClientRect();
-						const er = el.getBoundingClientRect();
-						ci = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };
-						cover.style.visibility = 'hidden';
+					const el = document.querySelector(".canbox") || document.querySelector("#main");
+					// Replace cover img with canvas
+					const img = el.querySelector("img.linkImg") || el.querySelector("img[src^='data:']");
+					let backup = null;
+					if (img && img.src && img.src.startsWith('data:')) {
+						const tmp = new Image();
+						await new Promise(r => { tmp.onload = r; tmp.onerror = r; tmp.src = img.src; });
+						if (tmp.complete && tmp.naturalWidth) {
+							const cv = document.createElement('canvas');
+							cv.width = tmp.naturalWidth;
+							cv.height = tmp.naturalHeight;
+							cv.className = img.className;
+							cv.style.cssText = img.style.cssText;
+							cv.getContext('2d').drawImage(tmp, 0, 0);
+							backup = { parent: img.parentNode, ref: img.nextSibling, el: img };
+							img.parentNode.insertBefore(cv, img);
+							img.parentNode.removeChild(img);
+						}
 					}
 					const canvas = await html2canvas(el, { useCORS: false, allowTaint: false });
-					if (ci) {
-						const img = new Image();
-						await new Promise((r) => { img.onload = r; img.onerror = r; img.src = ci.src; });
-						if (img.complete && img.naturalWidth) {
-							canvas.getContext('2d').drawImage(img, ci.x, ci.y, ci.w, ci.h);
+					// Restore
+					if (backup) {
+						const cvs = backup.parent.querySelectorAll('canvas');
+						for (const cv of cvs) {
+							backup.parent.insertBefore(backup.el, cv);
+							backup.parent.removeChild(cv);
+							break;
 						}
-						ci.img.style.visibility = '';
 					}
 					const base64 = canvas.toDataURL('image/jpeg', 1);
 					this.renderFinish(base64);

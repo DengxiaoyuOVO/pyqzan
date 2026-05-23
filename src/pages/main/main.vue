@@ -115,26 +115,36 @@ export default {
     async doSave() {
       uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
       try {
-        const el = document.querySelector(".canbox");
+        const el = document.querySelector(".canbox") || document.querySelector("#main");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        const scale = Math.max(window.devicePixelRatio || 1, 2) * 2;
-        // Hide cover, composite manually after screenshot
-        const cover = el.querySelector("img.linkImg");
-        let coverInfo = null;
-        if (cover && cover.src) {
-          const cr = cover.getBoundingClientRect();
-          const er = el.getBoundingClientRect();
-          coverInfo = { img: cover, x: cr.left - er.left, y: cr.top - er.top, w: cr.width, h: cr.height, src: cover.src };
-          cover.style.visibility = "hidden";
-        }
-        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale });
-        if (coverInfo) {
-          const ci = new Image();
-          await new Promise((resolve) => { ci.onload = resolve; ci.onerror = resolve; ci.src = coverInfo.src; });
-          if (ci.complete && ci.naturalWidth) {
-            canvas.getContext("2d").drawImage(ci, coverInfo.x * scale, coverInfo.y * scale, coverInfo.w * scale, coverInfo.h * scale);
+        // Replace cover img with canvas so html2canvas captures it natively
+        const img = el.querySelector("img.linkImg") || el.querySelector("img[src^='data:']");
+        let backup = null;
+        if (img && img.src && img.src.startsWith("data:")) {
+          const tmp = new Image();
+          await new Promise(r => { tmp.onload = r; tmp.onerror = r; tmp.src = img.src; });
+          if (tmp.complete && tmp.naturalWidth) {
+            const cv = document.createElement("canvas");
+            cv.width = tmp.naturalWidth;
+            cv.height = tmp.naturalHeight;
+            cv.className = img.className;
+            cv.style.cssText = img.style.cssText;
+            cv.getContext("2d").drawImage(tmp, 0, 0);
+            backup = { parent: img.parentNode, ref: img.nextSibling, el: img };
+            img.parentNode.insertBefore(cv, img);
+            img.parentNode.removeChild(img);
           }
-          coverInfo.img.style.visibility = "";
+        }
+        const scale = Math.max(window.devicePixelRatio || 1, 2) * 2;
+        const canvas = await html2canvas(el, { width: el.offsetWidth, height: el.offsetHeight, useCORS: false, scale });
+        // Restore original img
+        if (backup) {
+          const cvs = backup.parent.querySelectorAll("canvas");
+          for (const cv of cvs) {
+            backup.parent.insertBefore(backup.el, cv);
+            backup.parent.removeChild(cv);
+            break;
+          }
         }
         this.renderUrl = canvas.toDataURL("image/png", 1);
         uni.hideToast();
