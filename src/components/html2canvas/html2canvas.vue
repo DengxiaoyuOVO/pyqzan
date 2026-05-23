@@ -26,11 +26,13 @@
 					// Hide data URL cover, save info for manual composite
 					const coverImg = shareContent.querySelector('.linkImg');
 					let coverInfo = null;
+					console.log('coverImg found:', !!coverImg, 'src starts data:', coverImg && coverImg.src && coverImg.src.startsWith('data:'));
 					if (coverImg && coverImg.src && coverImg.src.startsWith('data:')) {
 						const sr = coverImg.getBoundingClientRect();
 						const pr = shareContent.getBoundingClientRect();
 						coverInfo = { src: coverImg.src, x: sr.left - pr.left, y: sr.top - pr.top, w: sr.width, h: sr.height };
 						coverImg.style.visibility = 'hidden';
+					console.log('coverInfo:', JSON.stringify(coverInfo));
 					}
 					
 					// Remove crossorigin, wait for remaining images
@@ -50,6 +52,7 @@
 						allowTaint: false
 					});
 					
+					console.log('compositing cover...');
 					// Manually composite cover onto canvas
 					if (coverInfo) {
 						const ci = new Image();
@@ -59,6 +62,7 @@
 							ctx.drawImage(ci, coverInfo.x, coverInfo.y, coverInfo.w, coverInfo.h);
 						}
 						coverImg.style.visibility = '';
+					console.log('composite done');
 					}
 					
 					const base64 = canvas.toDataURL('image/jpeg', 1);
