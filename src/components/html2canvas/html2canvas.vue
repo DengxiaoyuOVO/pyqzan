@@ -18,12 +18,22 @@
 			}
 		},
 		methods: {
-									async createImg() {
+															async createImg() {
 				try {
 					this.showLoading();
 					const shareContent = document.querySelector(this.domId);
 					
-					// Remove crossorigin from all images to avoid browser blocking
+					// Hide data URL cover, save info for manual composite
+					const coverImg = shareContent.querySelector('.linkImg');
+					let coverInfo = null;
+					if (coverImg && coverImg.src && coverImg.src.startsWith('data:')) {
+						const sr = coverImg.getBoundingClientRect();
+						const pr = shareContent.getBoundingClientRect();
+						coverInfo = { src: coverImg.src, x: sr.left - pr.left, y: sr.top - pr.top, w: sr.width, h: sr.height };
+						coverImg.style.visibility = 'hidden';
+					}
+					
+					// Remove crossorigin, wait for remaining images
 					const images = shareContent.querySelectorAll('img');
 					for (const img of images) {
 						img.removeAttribute('crossorigin');
@@ -39,6 +49,18 @@
 						useCORS: false,
 						allowTaint: false
 					});
+					
+					// Manually composite cover onto canvas
+					if (coverInfo) {
+						const ci = new Image();
+						await new Promise((resolve) => { ci.onload = resolve; ci.onerror = resolve; ci.src = coverInfo.src; });
+						if (ci.complete && ci.naturalWidth) {
+							const ctx = canvas.getContext('2d');
+							ctx.drawImage(ci, coverInfo.x, coverInfo.y, coverInfo.w, coverInfo.h);
+						}
+						coverImg.style.visibility = '';
+					}
+					
 					const base64 = canvas.toDataURL('image/jpeg', 1);
 					this.renderFinish(base64);
 				} catch(error){
