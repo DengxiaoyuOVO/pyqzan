@@ -20,7 +20,7 @@
 					this.showLoading();
 					const el = document.querySelector(this.domId);
 					const canvas = await html2canvas(el, {
-						useCORS: true,
+						useCORS: false,
 						allowTaint: false
 					});
 					const base64 = canvas.toDataURL('image/jpeg', 1);
