@@ -70,6 +70,7 @@ var defaultUrl = decodeURIComponent((location.search.match(/url=([^&]+)/)||['','
 urlInput.value = defaultUrl;
 
 if(defaultUrl.trim()){setTimeout(doFetch,300)}
+var coverBase64Data = "";
 
 async function doFetch(){
   var u = urlInput.value.trim();
@@ -87,6 +88,8 @@ async function doFetch(){
     btn.disabled = false; btn.textContent = '抓取';
     if(d.error){showToast('抓取失败: '+d.error);document.getElementById('result').classList.add('show');return}
     document.getElementById('title').value = d.title || '';
+    coverRawUrl = d.cover || "";
+    coverBase64Data = d.coverBase64 || "";
     if(d.coverBase64){
       document.getElementById('cover').src = d.coverBase64;
       document.getElementById('cover').style.display = 'block';
@@ -119,7 +122,7 @@ function chooseCover(){
 function goBack(){
   var t=document.getElementById('title').value.trim();
   if(!t){showToast('请输入标题');return}
-  var c=coverRawUrl||'';
+  var c=coverBase64Data||coverRawUrl||'';
   var back=returnUrl||'https://dengxiaoyuovo.github.io/pyqzan/#/pages/edit/edit?type=2';
   back+=(back.includes('?')?'&':'?')+'title='+encodeURIComponent(t);
   if(c)back+='&cover='+encodeURIComponent(c);
