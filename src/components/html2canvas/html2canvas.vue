@@ -27,9 +27,10 @@
 					const images = shareContent.querySelectorAll('img');
 					for (const img of images) {
 						img.removeAttribute('crossorigin');
+						if (!img.complete) {
+							await new Promise(r => { img.onload = r; img.onerror = r; });
+						}
 					}
-					
-					await new Promise(r => setTimeout(r, 100));
 					
 					const canvas = await html2canvas(shareContent, {
 						width: shareContent.offsetWidth,
