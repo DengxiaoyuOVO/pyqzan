@@ -39,8 +39,7 @@
 					}
 					const canvas = await html2canvas(el, {
 						useCORS: false,
-						allowTaint: false,
-						foreignObjectRendering: true
+						allowTaint: false
 					});
 					// 恢复原 img
 					if (backup) {

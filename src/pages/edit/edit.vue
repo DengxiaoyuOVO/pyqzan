@@ -205,7 +205,11 @@ export default {
       this.pageData.article.username = userinfo.username;
       this.pageData.article.avatar = userinfo.avatar;
       this.pageData.article.date = userinfo.date;
-      const app = getApp(); app.globalData.articleData = this.pageData;
+            // 封面图 base64 太大，用 sessionStorage 传递避免截断
+      sessionStorage.setItem('pyqzan_linkImg', this.pageData.linkInfo ? this.pageData.linkInfo.linkImg : '');
+      sessionStorage.setItem('pyqzan_linkText', this.pageData.linkInfo ? this.pageData.linkInfo.linkText : '');
+      const app = getApp();
+      app.globalData.articleData = this.pageData;
       if (this.pageData.type == 2) {
         uni.navigateTo({
           url: '../main/main',

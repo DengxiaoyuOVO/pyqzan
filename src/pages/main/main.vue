@@ -127,7 +127,7 @@ export default {
         const el = document.querySelector(".canbox") || document.querySelector("#main");
         if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
         // 找到封面 img，替换为 canvas（html2canvas 对 canvas 支持完美）
-        const img = el.querySelector(`img.linkImg`) || el.querySelector(`img[src^="""data:"""]`);
+        const img = el.querySelector(`img.linkImg`);
         let backup = null;
         if (img && img.src && img.src.startsWith("data:")) {
           const tmp = new Image();
