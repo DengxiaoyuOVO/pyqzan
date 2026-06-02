@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>公众号信息抓取</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.card{background:#fff;border-radius:16px;padding:32px 24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+h2{text-align:center;color:#333;margin-bottom:8px;font-size:22px}
+.subtitle{text-align:center;color:#999;font-size:13px;margin-bottom:24px}
+.input-group{display:flex;gap:8px;margin-bottom:20px}
+input[type="text"]{flex:1;padding:12px 14px;border:2px solid #e0e0e0;border-radius:10px;font-size:14px;outline:none;transition:border .2s}
+input[type="text"]:focus{border-color:#667eea}
+.btn{padding:12px 20px;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-weight:600;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;white-space:nowrap}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,126,234,.4)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-full{display:block;width:100%;padding:14px;font-size:16px;margin-bottom:8px}
+.btn-outline{display:block;width:100%;background:#f5f5f5;color:#666;padding:10px;font-size:13px}
+.result{display:none}
+.result.show{display:block}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;color:#999;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.field input{border:2px solid #e0e0e0;width:100%}
+.preview-box{border:2px dashed #e0e0e0;border-radius:10px;padding:20px;text-align:center;margin-bottom:16px;cursor:pointer;transition:border .2s;overflow:hidden}
+.preview-box:hover{border-color:#667eea}
+.preview-box img{max-width:100%;max-height:200px;border-radius:6px;display:block;margin:0 auto}
+.preview-placeholder{color:#ccc;font-size:13px}
+.loading{display:none;text-align:center;color:#999;margin:16px 0;font-size:14px}
+.loading.show{display:block}
+.loading .spinner{display:inline-block;width:20px;height:20px;border:2px solid #e0e0e0;border-top-color:#667eea;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.divider{display:flex;align-items:center;margin:20px 0;color:#ccc;font-size:12px}
+.divider:before,.divider:after{content:"";flex:1;border-bottom:1px solid #eee}
+.divider span{padding:0 12px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>🔍 公众号信息抓取</h2>
+  <p class="subtitle">粘贴文章链接，自动获取标题和封面</p>
+  <div class="input-group">
+    <input id="url" type="text" placeholder="粘贴微信公众号文章链接...">
+    <button class="btn btn-primary" id="fetchBtn" onclick="doFetch()">抓取</button>
+  </div>
+  <div class="loading" id="loading"><span class="spinner"></span>正在抓取...</div>
+  <div class="result" id="result">
+    <div class="field"><label>文章标题</label><input id="title" type="text" placeholder="输入或修改标题"></div>
+    <div class="field"><label>封面图片</label>
+      <div class="preview-box" id="coverBox" onclick="chooseCover()">
+        <img id="cover" src="" style="display:none" onerror="this.style.display='none';document.getElementById('coverPlaceholder').style.display='block'">
+        <div id="coverPlaceholder" class="preview-placeholder">点击选择本地封面图片</div>
+      </div>
+    </div>
+    <div class="divider"><span>或手动填写</span></div>
+    <button class="btn btn-primary btn-full" id="useBtn" onclick="goBack()">✅ 使用此信息</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var returnUrl = decodeURIComponent((location.search.match(/return=([^&]+)/)||['',''])[1]||'');
+if(!returnUrl){try{returnUrl=document.referrer}catch(e){}}
+
+var urlInput = document.getElementById('url');
+var defaultUrl = decodeURIComponent((location.search.match(/url=([^&]+)/)||['',''])[1]||'');
+urlInput.value = defaultUrl;
+
+if(defaultUrl.trim()){setTimeout(doFetch,300)}
+var coverBase64Data = "";
+
+async function doFetch(){
+  var u = urlInput.value.trim();
+  if(!u){showToast('请粘贴文章链接');return}
+  if(!u.includes('mp.weixin.qq.com')){showToast('请输入微信公众号文章链接');return}
+  var btn = document.getElementById('fetchBtn');
+  btn.disabled = true; btn.textContent = '抓取中...';
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('result').classList.remove('show');
+  
+  try{
+    var r = await fetch('/api/wechat-fetch?url='+encodeURIComponent(u));
+    var d = await r.json();
+    document.getElementById('loading').classList.remove('show');
+    btn.disabled = false; btn.textContent = '抓取';
+    if(d.error){showToast('抓取失败: '+d.error);document.getElementById('result').classList.add('show');return}
+    document.getElementById('title').value = d.title || '';
+    coverRawUrl = d.cover || "";
+    coverBase64Data = d.coverBase64 || "";
+    if(d.coverBase64){
+      document.getElementById('cover').src = d.coverBase64;
+      document.getElementById('cover').style.display = 'block';
+      document.getElementById('coverPlaceholder').style.display = 'none';
+    }
+    document.getElementById('result').classList.add('show');
+    if(d.title){showToast('抓取成功！')}
+  }catch(e){
+    document.getElementById('loading').classList.remove('show');
+    btn.disabled = false; btn.textContent = '抓取';
+    document.getElementById('result').classList.add('show');
+    showToast('网络错误，请手动填写');
+  }
+}
+
+function chooseCover(){
+  var i = document.createElement('input');i.type='file';i.accept='image/*';
+  i.onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      document.getElementById('cover').src=ev.target.result;
+      document.getElementById('cover').style.display='block';
+      document.getElementById('coverPlaceholder').style.display='none';
+    };
+    reader.readAsDataURL(f);
+  };i.click();
+}
+
+function goBack(){
+  var t=document.getElementById('title').value.trim();
+  if(!t){showToast('请输入标题');return}
+  var c=coverBase64Data||coverRawUrl||'';
+  var back=returnUrl||'https://dengxiaoyuovo.github.io/pyqzan/#/pages/edit/edit?type=2';
+  back+=(back.includes('?')?'&':'?')+'title='+encodeURIComponent(t);
+  if(c)back+='&cover='+encodeURIComponent(c);
+  location.href=back;
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show')},2000);
+}
+</script>
+</body>
+</html>
