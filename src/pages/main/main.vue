@@ -18,7 +18,8 @@
         <view class="content" v-if="pageData.article.pictureList && pageData.article.pictureList[0]">
           <image :src="pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
         </view>
-        <view class="linkCard" v-if="pageData.type == 2 && pageData.linkInfo">
+                <view class="linkCard" v-if="true">
+          <text style="color:red;font-size:20upx;padding:10upx 20upx;display:block">[DEBUG] type={{pageData.type}} linkInfo={{!!pageData.linkInfo}} coverLen={{pageData.linkInfo&&pageData.linkInfo.linkImg?pageData.linkInfo.linkImg.length:0}} first50={{pageData.linkInfo&&pageData.linkInfo.linkImg?pageData.linkInfo.linkImg.substring(0,50):'N/A'}}</text>
           <image class="linkImg" :src="pageData.linkInfo.linkImg" mode="widthFix"></image>
           <text class="linkTitle">{{ pageData.linkInfo.linkText }}</text>
         </view>
