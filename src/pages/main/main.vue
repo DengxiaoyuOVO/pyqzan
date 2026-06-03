@@ -1,63 +1,45 @@
 ﻿<template>
   <view class="main">
-    <view style="background:red;color:white;padding:20upx;text-align:center;font-size:24upx;font-weight:bold">=== DEPLOY CHECK ===</view>
-    <renderimg-popup
-      :imgUrl="renderUrl"
-      :isShow="isShowRender"
-      @close="isShowRender = false"
-    />
-    <longselect-module
-      @renderImg="preImg"
-      :coordinate="coordinate"
-      :hidden="longSelectHidden"
-    />
-    <html2canvas ref="html2canvas" :domId="domId" @renderFinish="renderFinish">
-      <view class="canbox" id="main" @touchstart="hideLong">
-        <block v-if="pageData.navbar">
-          <navbar @handle="handleRight" ismain :pageData="pageData" bgColor="#111" textColor="#fff" />
-        </block>
-        <view class="content" v-if="pageData.article.pictureList && pageData.article.pictureList[0]">
-          <image :src="pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
-        </view>
-        <view class="linkCard" v-if="pageData.type == 2 && pageData.linkInfo">
-          <image class="linkImg" :src="pageData.linkInfo.linkImg" mode="widthFix"></image>
-          <text class="linkTitle">{{ pageData.linkInfo.linkText }}</text>
-        </view>
-        <view class="boottom">
-          <view class="boot_text" v-html="pageData.article.contentText"></view>
-          <view class="footer">
-            <view class="foot_left">
-              <text class="icon-good iconfont"></text>
-              <text class="zan moreright">赞</text>
-              <text class="icon-chat iconfont"></text>
-              <text class="comment">评论</text>
-            </view>
-            <view class="foot_right">
-              <text class="icon-good iconfont"></text>
-              <text class="zan">{{ pageData.comment.goodUserAvatarList }}</text>
-              <text class="icon-chat iconfont"></text>
-              <text class="comment">{{ pageData.comment.commentNum }}</text>
-            </view>
+    <view class="canbox" id="main">
+      <block v-if="pageData.navbar">
+        <navbar @handle="handleRight" ismain :pageData="pageData" bgColor="#111" textColor="#fff" />
+      </block>
+      <view class="content" v-if="pageData.article.pictureList && pageData.article.pictureList[0]">
+        <image :src="pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
+      </view>
+      <view class="linkCard" v-if="pageData.type == 2 && pageData.linkInfo">
+        <image class="linkImg" :src="pageData.linkInfo.linkImg" mode="widthFix"></image>
+        <text class="linkTitle">{{ pageData.linkInfo.linkText }}</text>
+      </view>
+      <view class="boottom">
+        <view class="boot_text" v-html="pageData.article.contentText"></view>
+        <view class="footer">
+          <view class="foot_left">
+            <text class="icon-good iconfont"></text>
+            <text class="zan moreright">赞</text>
+            <text class="icon-chat iconfont"></text>
+            <text class="comment">评论</text>
+          </view>
+          <view class="foot_right">
+            <text class="icon-good iconfont"></text>
+            <text class="zan">{{ pageData.comment.goodUserAvatarList }}</text>
+            <text class="icon-chat iconfont"></text>
+            <text class="comment">{{ pageData.comment.commentNum }}</text>
           </view>
         </view>
       </view>
-    </html2canvas>
-    <view class="save-btn" @click="doSave" v-if="!isShowRender">
+    </view>
+    <view class="save-btn" @click="showTip">
       <text class="iconfont icon-good"></text>
-      <text>保存截图</text>
+      <text>如何保存到相册</text>
     </view>
   </view>
 </template>
+
 <script>
-import html2canvas from "html2canvas";
 export default {
   data() {
     return {
-      isShowRender: false,
-      renderUrl: "",
-      coordinate: {},
-      longSelectHidden: false,
-      domId: "",
       pageData: {
         type: 2,
         navbar: false,
@@ -73,7 +55,6 @@ export default {
     };
   },
   onLoad(option) {
-    this.domId = "#poster";
     const app = getApp();
     if (app.globalData.articleData) {
       Object.assign(this.pageData, app.globalData.articleData);
@@ -92,26 +73,13 @@ export default {
     }
   },
   methods: {
-    handleRight(data) { this.coordinate = data; this.longSelectHidden = !this.longSelectHidden; },
-    preImg() { setTimeout(() => { this.$refs.html2canvas.createImg(); }, 200); },
-    renderFinish(filePath) { this.renderUrl = filePath; uni.hideToast(); this.isShowRender = true; },
-    async doSave() {
-      uni.showToast({ title: "正在生成...", icon: "none", mask: true, duration: 5000 });
-      try {
-        const el = document.querySelector(".canbox") || document.querySelector("#main");
-        if (!el) { uni.hideToast(); uni.showToast({ title: "未找到元素", icon: "none" }); return; }
-        const scale = Math.max(window.devicePixelRatio || 1, 2) * 2;
-        const canvas = await html2canvas(el, {
-          width: el.offsetWidth, height: el.offsetHeight,
-          useCORS: false, allowTaint: true, scale
-        });
-        this.renderUrl = canvas.toDataURL("image/png", 1);
-        uni.hideToast();
-        this.isShowRender = true;
-      } catch(e) {
-        uni.hideToast();
-        uni.showToast({ title: "生成失败: " + e.message, icon: "none", duration: 3000 });
-      }
+    showTip() {
+      uni.showModal({
+        title: "保存截图",
+        content: "请使用手机自带截图功能（同时按电源键+音量键，或三指下滑），然后在相册中裁剪即可。",
+        showCancel: false,
+        confirmText: "知道了"
+      });
     },
   },
 };
