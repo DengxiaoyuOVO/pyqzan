@@ -4,9 +4,13 @@
       <block v-if="pageData.navbar">
         <navbar @handle="handleRight" ismain :pageData="pageData" bgColor="#111" textColor="#fff" />
       </block>
-      <view class="content" v-if="(pageData.type==2&&pageData.linkInfo&&pageData.linkInfo.linkImg)||(pageData.article.pictureList&&pageData.article.pictureList[0])">
-        <image :src="pageData.type==2?pageData.linkInfo.linkImg:pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
-      </view>
+      <view class="content">
+          <image
+            :src="pageData.article.pictureList[0]"
+            mode="widthFix"
+            class="con_img"
+          ></image>
+        </view>
       <view class="boottom">
         <view class="boot_text" v-html="pageData.article.contentText"></view>
         <view class="footer">

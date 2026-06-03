@@ -206,6 +206,7 @@ export default {
       this.pageData.article.avatar = userinfo.avatar;
       this.pageData.article.date = userinfo.date;
             // 封面图 base64 太大，用 sessionStorage 传递避免截断
+            if (this.pageData.type == 2 && this.pageData.linkInfo && this.pageData.linkInfo.linkImg) { this.pageData.article.pictureList = [this.pageData.linkInfo.linkImg]; }
       sessionStorage.setItem('pyqzan_linkImg', this.pageData.linkInfo ? this.pageData.linkInfo.linkImg : '');
       sessionStorage.setItem('pyqzan_linkText', this.pageData.linkInfo ? this.pageData.linkInfo.linkText : '');
       const app = getApp();
