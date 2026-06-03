@@ -115,7 +115,7 @@ export default {
 }
 .pageindex {
   .head {
-    width: 100%; height: 90upx; background-color: #07c19f; color: #fff;
+    width: 100%; height: 90upx; background-color: #1677ff; color: #fff;
     display: flex; justify-content: space-between; align-items: center;
     padding: 0 20upx; box-sizing: border-box;
     .head_left { font-size: 40upx; }
