@@ -1,23 +1,11 @@
-<template>
+﻿<template>
   <popup ref="rulepopup" type="fadeInMiddle" @hide="close">
     <view class="rule">
       <scroll-view scroll-y="true" class="rule_popup" v-if="type === 'index'">
         <view class="popup_title"> 使用说明 </view>
         <view class="rule_content">
-          <view class="list">
-            <view class="list_title">两种模式说明</view>
-            <view class="list_box">
-              <view class="list_left">自动生成版: </view>
-              <view class="list_right"
-                >根据填写信息(朋友圈发表者、发表内容等)自动生成集赞截图。</view
-              >
-            </view>
-            <view class="list_box">
-              <view class="list_left">截图版: </view>
-              <view class="list_right">
-                需要自己到朋友圈截取所需要集赞的内容截图，然后上传本系统会自动生成集赞图。
-              </view>
-            </view>
+          
+           
           </view>
           <view class="list">
             <view class="list_title">三种截图样式说明</view>
@@ -132,7 +120,7 @@
           <view class="list">
             <view class="list_title">留言说明</view>
             <view class="list_box"
-              >只有自动生成模式才能发表留言并进行回复，截图版的评论是上传截图生成的，不能自动生成留言。点击某条留言便可以进行回复。</view
+              >点击某条留言便可以进行回复。点击某条留言便可以进行回复。</view
             >
             <image
               class="list_img artimg"
