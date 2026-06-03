@@ -4,12 +4,8 @@
       <block v-if="pageData.navbar">
         <navbar @handle="handleRight" ismain :pageData="pageData" bgColor="#111" textColor="#fff" />
       </block>
-      <view class="content" v-if="pageData.article.pictureList && pageData.article.pictureList[0]">
-        <image :src="pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
-      </view>
-      <view class="linkCard" v-if="pageData.type == 2 && pageData.linkInfo">
-        <image class="linkImg" :src="pageData.linkInfo.linkImg" mode="widthFix"></image>
-        <text class="linkTitle">{{ pageData.linkInfo.linkText }}</text>
+      <view class="content" v-if="(pageData.type==2&&pageData.linkInfo&&pageData.linkInfo.linkImg)||(pageData.article.pictureList&&pageData.article.pictureList[0])">
+        <image :src="pageData.type==2?pageData.linkInfo.linkImg:pageData.article.pictureList[0]" mode="widthFix" class="con_img"></image>
       </view>
       <view class="boottom">
         <view class="boot_text" v-html="pageData.article.contentText"></view>
@@ -97,11 +93,6 @@ export default {
       flex: 1; background-color: #000; max-height: 85vh; height: 100%;
       overflow: hidden; display: flex; align-items: center; margin: -2upx 0;
       .con_img { width: 100%; }
-    }
-    .linkCard {
-      background-color: #0f0e13;
-      .linkImg { width: 100%; display: block; }
-      .linkTitle { display: block; padding: 14upx 20upx; font-size: 28upx; color: #fffeff; line-height: 1.4; }
     }
     .boottom { width: 100%; height: auto; background-color: #0f0e13; }
     .boot_text {
