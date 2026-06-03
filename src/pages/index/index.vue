@@ -6,7 +6,7 @@
       @close="isRulePopup = false"
     />
     <view class="head">
-      <view class="head_left"> 朋友圈集赞生成工具 </view>
+      <view class="head_left"> 朋友圈集赞截图生成工具 </view>
       <view class="head_right">
         <text class="iconfont icon-github-fill" @tap="goGit"></text>
       </view>
